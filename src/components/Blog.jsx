@@ -1,6 +1,10 @@
 /* eslint-disable linebreak-style */
+import { useSelector } from 'react-redux'
 import Togglable from './Togglable'
-const Blog = ({ blog, handleLike, handleRemove, user }) => {
+const Blog = ({ blog, handleLike, handleRemove }) => {
+
+  const userInfo= useSelector((state) => state.user.userInfo)
+  
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -11,7 +15,7 @@ const Blog = ({ blog, handleLike, handleRemove, user }) => {
   const incrementLike = (event) => {
     event.preventDefault()
     handleLike(blog)
-  };
+  }
 
   const deleteBlog = (event) => {
     event.preventDefault()
@@ -29,7 +33,7 @@ const Blog = ({ blog, handleLike, handleRemove, user }) => {
           <button onClick={incrementLike}>like</button>
         </div>
         <div>{blog.author}</div>
-       {user.username?.toString() === blog.user.username?.toString() && (
+        {userInfo.username?.toString() === blog.user.username?.toString() && (
           <div style={{ marginTop: 5 }}>
             <button style={{ backgroundColor: '#0089ff' }} onClick={deleteBlog}>remove</button>
           </div>
@@ -37,6 +41,6 @@ const Blog = ({ blog, handleLike, handleRemove, user }) => {
       </Togglable>
     </div>
   )
-};
+}
 
 export default Blog

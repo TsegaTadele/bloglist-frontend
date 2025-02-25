@@ -4,15 +4,20 @@ import App from './App'
 import './index.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NotificationContextProvider } from './components/NotificationContext'
+import { Provider } from 'react-redux'
+import store from './store'
 
 const queryClient=new QueryClient()
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <QueryClientProvider client={queryClient} >
-    <NotificationContextProvider>
-      <App />
-    </NotificationContextProvider>
+  <Provider store={store}>
+    <QueryClientProvider client={queryClient} >
+      <NotificationContextProvider>
+        <App />
+      </NotificationContextProvider>
 
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </Provider>
+
 
 
 )

@@ -1,5 +1,5 @@
 /* eslint-disable linebreak-style */
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef  } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import Login from './components/Login'
@@ -7,25 +7,20 @@ import loginService from './services/loginService'
 import NewBlog from './components/NewBlog'
 import Togglable from './components/Togglable'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useDispatch,useSelector } from 'react-redux'
 
 import { useNotification } from './components/NotificationContext'
 import Notification from './components/Notification'
+import { clearUser, setUser } from './reducer/userReducer'
 
 const App = () => {
 
   const blogFormRef = useRef()
 
-  const [user, setUser] = useState(null)
-  const { addNotification, removeNotification } = useNotification()
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
+  const { addNotification } = useNotification()
 
-      setUser(user)
-      blogService.setToken(user.token)
-    }
-  }, [])
+  const dispatch= useDispatch()
+  const user = useSelector((state) => state.user.userInfo)
 
   const result = useQuery({
     queryKey: ['blogs'],
@@ -100,9 +95,10 @@ const App = () => {
         username,
         password,
       })
-      setUser(user) // Set the user state with the returned user data
+    //  setUser(user) // Set the user state with the returned user data
       // Optionally save user info to local storage
-      window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
+     // window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
+      dispatch(setUser(user))
       blogService.setToken(user.token)
       // setUsername('')
       //  setPassword('')
@@ -142,8 +138,9 @@ const App = () => {
         {user?.username} logged in{' '}
         <button
           onClick={() => {
-            window.localStorage.removeItem('loggedBlogUser')
-            setUser(null)
+            // window.localStorage.removeItem('loggedBlogUser')
+            // setUser(null)
+            dispatch(clearUser())
           }}
         >
           logout
@@ -160,7 +157,6 @@ const App = () => {
               blog={blog}
               handleLike={updateBlogLike}
               handleRemove={deleteBlog}
-              user={user}
             />
           ))}
         </div>
