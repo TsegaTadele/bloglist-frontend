@@ -1,25 +1,28 @@
 /* eslint-disable linebreak-style */
-import { useState, useEffect, useRef  } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
-import Login from './components/Login'
-import loginService from './services/loginService'
-import NewBlog from './components/NewBlog'
-import Togglable from './components/Togglable'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useDispatch,useSelector } from 'react-redux'
+import { useQuery } from '@tanstack/react-query'
+import { useDispatch, useSelector } from 'react-redux'
+import { clearUser, setUser } from './reducer/userReducer'
+import userService from './services/userService'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 
+// Services
+import blogService from './services/blogService'
+import loginService from './services/loginService'
+
+// Components
+import Blogs from './components/Blogs'
+import Login from './components/Login'
+import Togglable from './components/Togglable'
 import { useNotification } from './components/NotificationContext'
 import Notification from './components/Notification'
-import { clearUser, setUser } from './reducer/userReducer'
+import UserList from './components/UserList'
+import UserBlogs from './components/userBlogs'
+import Blog from './components/Blog'
 
 const App = () => {
-
-  const blogFormRef = useRef()
-
   const { addNotification } = useNotification()
 
-  const dispatch= useDispatch()
+  const dispatch = useDispatch()
   const user = useSelector((state) => state.user.userInfo)
 
   const result = useQuery({
@@ -27,66 +30,12 @@ const App = () => {
     queryFn: () => blogService.getAll(),
     refetchOnWindowFocus: false,
   })
-  const queryClient = useQueryClient()
-  const newBlogs = useMutation({
-    mutationFn: blogService.create,
-    onSuccess: (newB) => {
-      const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(['blogs'], blogs.concat(newB))
-    },
+
+  const usersList = useQuery({
+    queryKey: ['users'],
+    queryFn: () => userService.getuserList(),
+    refetchOnWindowFocus: false,
   })
-
-  const updateBlogs = useMutation({
-    mutationFn: blogService.updateBlog,
-    onSuccess: (updatedB) => {
-      const blog = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(
-        ['blogs'],
-        blog.map((b) => (b.id === updatedB.id ? updatedB : b))
-      )
-    },
-  })
-
-  const removeBlogs = useMutation({
-    mutationFn: blogService.deleteBlog,
-    onSuccess: (_, variables) => {
-      const blog = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(
-        ['blogs'],
-        blog.filter((b) => b.id.toString() !== variables.blog.id.toString())
-      )
-    },
-  })
-
-  const addBlog = async (title, author, url) => {
-    blogFormRef.current.toggleVisibility()
-    try {
-      newBlogs.mutate({ title, author, url })
-
-      addNotification({
-        type: 'info',
-        message: ' Saved successfully',
-      })
-    } catch (error) {
-      addNotification({ message: `${error}`, type: 'error' })
-    }
-  }
-  const updateBlogLike = async (blog) => {
-    try {
-      updateBlogs.mutate({ blog })
-      addNotification({ message: 'Updated', type: 'info' })
-    } catch (error) {
-      addNotification({ message: `${error}`, type: 'error' })
-    }
-  }
-  const deleteBlog = async (blog) => {
-    try {
-      removeBlogs.mutate({ blog })
-      addNotification({ message: `${blog.title} is deleted `, type: 'info' })
-    } catch (error) {
-      addNotification({ message: `${error}`, type: 'error' })
-    }
-  }
 
   const onLogin = async (username, password) => {
     try {
@@ -95,13 +44,8 @@ const App = () => {
         username,
         password,
       })
-    //  setUser(user) // Set the user state with the returned user data
-      // Optionally save user info to local storage
-     // window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
       dispatch(setUser(user))
       blogService.setToken(user.token)
-      // setUsername('')
-      //  setPassword('')
     } catch (error) {
       let message = ''
       if (error.response && error.response.status === 401) {
@@ -127,41 +71,38 @@ const App = () => {
     )
 
   return (
-    <div>
-      <h1>Blogs</h1>
-      <Notification />
-      {console.log(
-        'result',
-        result.data?.sort((a, b) => b.likes - a.likes)
-      )}
-      <div>
-        {user?.username} logged in{' '}
+    <Router>
+      <div><Link to="/blogs">blogs</Link>
+        <Link to="/user">bsers</Link>
+        {user?.username} logged in
         <button
-          onClick={() => {
-            // window.localStorage.removeItem('loggedBlogUser')
-            // setUser(null)
-            dispatch(clearUser())
-          }}
+          style={{ marginTop: '10px' }}
+          onClick={() => dispatch(clearUser())}
         >
-          logout
-        </button>{' '}
+              logout
+        </button>
       </div>
+
       <div>
-        <Togglable buttonLabel="new blog" ref={blogFormRef}>
-          <NewBlog createNewBlog={addBlog} />
-        </Togglable>
+        <h1>blog app</h1>
+        <Notification />
         <div>
-          {result.data?.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              handleLike={updateBlogLike}
-              handleRemove={deleteBlog}
-            />
-          ))}
+
         </div>
+
+        <Routes>
+          <Route
+            path="/user/:id"
+            element={<UserBlogs userList={usersList} />}
+          />
+
+          <Route path="/user" element={<UserList usersList={usersList} />} />
+          <Route path="/blog/:id" element={<Blog blogs={result.data} />} />
+          <Route path="/blogs" element={<Blogs blogs={result.data} />} />
+          <Route path="" element={<Blogs blogs={result.data} />} />
+        </Routes>
       </div>
-    </div>
+    </Router>
   )
 }
 

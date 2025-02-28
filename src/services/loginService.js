@@ -10,4 +10,6 @@ const login = async (credentials) => {
     throw error
   }
 }
+
+
 export default { login }
