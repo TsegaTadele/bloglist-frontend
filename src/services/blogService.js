@@ -1,7 +1,6 @@
 /* eslint-disable linebreak-style */
 import axios from 'axios'
-const baseUrl = '/api/blogs'
-
+const baseUrl =  '/api/blogs'
 let token = null
 
 const setToken = newToken => {
@@ -9,6 +8,7 @@ const setToken = newToken => {
 }
 
 const getAll = () => {
+
   const request = axios.get(baseUrl)
   return request.then(response => response.data)
 }
@@ -34,8 +34,7 @@ const updateBlog= async({ blog }) => {
   return response.data
 }
 
-const deleteBlog=async({blog}) => {
-  console.log(' delete Blog  result ', blog)
+const deleteBlog=async({ blog }) => {
   const config={
     headers:{ Authorization:token }
   }

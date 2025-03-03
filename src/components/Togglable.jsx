@@ -1,6 +1,7 @@
 /* eslint-disable linebreak-style */
 import { forwardRef, useImperativeHandle, useState } from 'react'
 import PropTypes from 'prop-types'
+import { Button, Container } from '@mui/material'
 
 const Togglable = forwardRef((props,ref) => {
   const [visible, setVisible] = useState(false)
@@ -14,15 +15,16 @@ const Togglable = forwardRef((props,ref) => {
     return { toggleVisibility }
   })
   return (
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+    <Container style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <Button onClick={toggleVisibility}>{props.buttonLabel}</Button>
       </div>
       <div style={showWhenVisible} className="togglableContent">
-        <button onClick={toggleVisibility}>{props?.buttonHide || 'cancel'}</button>
+        <Button onClick={toggleVisibility}>{props?.buttonHide || 'cancel'}</Button>
+       
         {props.children}
       </div>
-    </div>
+    </Container>
   )
 })
 Togglable.propTypes =

@@ -1,5 +1,4 @@
 /* eslint-disable linebreak-style */
-// NotificationList.js
 import React from 'react'
 import { useNotification } from './NotificationContext'
 

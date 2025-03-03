@@ -12,7 +12,7 @@ test('renders content', () => {
     },
   }
 
-  const { container } = render(<Blog blog={blog} user='Tsega' />)
+  const { container } = render(<Blog blog={blog} user="Tsega" />)
 
   screen.getByText('First test component on blog')
   screen.getByText('Tsega Tadele')
@@ -44,7 +44,6 @@ test('like button is clicked twice', async () => {
 })
 
 test('when blog removed', async () => {
-
   const blog = {
     title: 'First test component on blog',
     author: 'Tsega Tadele',
@@ -52,26 +51,25 @@ test('when blog removed', async () => {
     likes: 0,
     user: {
       username: 'Tsega',
-    }, }
+    },
+  }
 
-    const handleLike = vi.fn();
-    const handleRemove = vi.fn();
-  
-    const user = { username: 'Tsega' }; // User object that matches blog's user
-  
-    render(<Blog blog={blog} handleRemove={handleRemove} user={user} />);
-  
-    const removeButton = screen.getByText('remove');
+  const handleLike = vi.fn()
+  const handleRemove = vi.fn()
+
+  const user = { username: 'Tsega' } // User object that matches blog's user
+
+  render(<Blog blog={blog} handleRemove={handleRemove} user={user} />)
+
+  const removeButton = screen.getByText('remove')
 
   // Mock the confirm function
-  global.confirm = vi.fn(() => true); // Simulate user confirming the deletion
+  global.confirm = vi.fn(() => true) // Simulate user confirming the deletion
 
   // Click the remove button
-  await userEvent.click(removeButton);
+  await userEvent.click(removeButton)
 
   // Expect handleRemove to be called once
-  expect(handleRemove).toHaveBeenCalledTimes(1);
-  expect(handleRemove).toHaveBeenCalledWith(blog); // Check if it was called with the correct blog
-});
-
-
+  expect(handleRemove).toHaveBeenCalledTimes(1)
+  expect(handleRemove).toHaveBeenCalledWith(blog) // Check if it was called with the correct blog
+})
